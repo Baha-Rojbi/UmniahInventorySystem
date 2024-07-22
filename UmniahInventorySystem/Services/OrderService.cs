@@ -3,6 +3,7 @@ using UmniahInventorySystem.Data;
 using UmniahInventorySystem.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace UmniahInventorySystem.Services
 {
@@ -113,5 +114,18 @@ namespace UmniahInventorySystem.Services
 
             return true;
         }
+        public async Task<IEnumerable<Order>> GetOrders(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return null;
+
+            return await _context.Orders
+                .Include(o => o.Item)
+                .Include(o => o.FromShop)
+                .Include(o => o.ToShop)
+                .Where(o => o.FromShopId == user.ShopId || o.ToShopId == user.ShopId)
+                .ToListAsync();
+        }
+
     }
 }

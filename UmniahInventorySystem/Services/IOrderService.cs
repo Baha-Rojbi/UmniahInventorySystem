@@ -13,5 +13,6 @@ namespace UmniahInventorySystem.Services
         Task<bool> DeleteOrder(int id);
         Task<bool> ApproveOrder(int id);
         Task<bool> TransferOrder(int id);
+        Task<IEnumerable<Order>> GetOrders(string userId)
     }
 }

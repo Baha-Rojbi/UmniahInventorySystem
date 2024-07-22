@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using UmniahInventorySystem.Models;
 
 namespace UmniahInventorySystem.Data
 {
-    public class MyDbContext : DbContext
+    public class MyDbContext : IdentityDbContext<ApplicationUser>
     {
         public MyDbContext(DbContextOptions<MyDbContext> options) : base(options) { }
 

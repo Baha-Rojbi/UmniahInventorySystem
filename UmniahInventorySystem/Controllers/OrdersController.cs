@@ -3,24 +3,31 @@ using UmniahInventorySystem.Models;
 using UmniahInventorySystem.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace UmniahInventorySystem.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public OrdersController(IOrderService orderService)
+        public OrdersController(IOrderService orderService, UserManager<ApplicationUser> userManager)
         {
             _orderService = orderService;
+            _userManager = userManager;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
-            var orders = await _orderService.GetOrders();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var orders = await _orderService.GetOrders(userId);
             return Ok(orders);
         }
 
