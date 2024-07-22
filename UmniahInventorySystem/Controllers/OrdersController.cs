@@ -27,7 +27,7 @@ namespace UmniahInventorySystem.Controllers
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var orders = await _orderService.GetOrders(userId);
+            var orders = await _orderService.GetShopOrders(userId);
             return Ok(orders);
         }
 

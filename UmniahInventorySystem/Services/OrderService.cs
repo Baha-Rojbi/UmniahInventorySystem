@@ -10,10 +10,12 @@ namespace UmniahInventorySystem.Services
     public class OrderService : IOrderService
     {
         private readonly MyDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public OrderService(MyDbContext context)
+        public OrderService(MyDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<IEnumerable<Order>> GetOrders()
@@ -114,7 +116,7 @@ namespace UmniahInventorySystem.Services
 
             return true;
         }
-        public async Task<IEnumerable<Order>> GetOrders(string userId)
+        public async Task<IEnumerable<Order>> GetShopOrders(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return null;
