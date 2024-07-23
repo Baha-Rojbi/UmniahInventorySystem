@@ -121,6 +121,15 @@ namespace UmniahInventorySystem.Services
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return null;
 
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
+            {
+                return await _context.Orders
+                    .Include(o => o.Item)
+                    .Include(o => o.FromShop)
+                    .Include(o => o.ToShop)
+                    .ToListAsync();
+            }
+
             return await _context.Orders
                 .Include(o => o.Item)
                 .Include(o => o.FromShop)
@@ -128,6 +137,7 @@ namespace UmniahInventorySystem.Services
                 .Where(o => o.FromShopId == user.ShopId || o.ToShopId == user.ShopId)
                 .ToListAsync();
         }
+
 
     }
 }

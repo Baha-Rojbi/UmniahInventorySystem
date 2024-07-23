@@ -24,6 +24,7 @@ namespace UmniahInventorySystem.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Shop,Admin")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -32,6 +33,7 @@ namespace UmniahInventorySystem.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Shop,Admin")]
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
             var order = await _orderService.GetOrderById(id);
@@ -43,6 +45,7 @@ namespace UmniahInventorySystem.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Shop")]
         public async Task<ActionResult<Order>> CreateOrder([FromBody] Order order)
         {
             if (!ModelState.IsValid)
@@ -55,6 +58,7 @@ namespace UmniahInventorySystem.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Shop")]
         public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order order)
         {
             if (id != order.OrderID)
@@ -72,6 +76,7 @@ namespace UmniahInventorySystem.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Shop")]
         public async Task<IActionResult> DeleteOrder(int id)
         {
             var success = await _orderService.DeleteOrder(id);
@@ -83,6 +88,7 @@ namespace UmniahInventorySystem.Controllers
         }
 
         [HttpPost("{id}/approve")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ApproveOrder(int id)
         {
             var success = await _orderService.ApproveOrder(id);
@@ -94,6 +100,7 @@ namespace UmniahInventorySystem.Controllers
         }
 
         [HttpPost("{id}/transfer")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> TransferOrder(int id)
         {
             var success = await _orderService.TransferOrder(id);

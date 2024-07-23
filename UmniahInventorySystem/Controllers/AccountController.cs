@@ -36,8 +36,15 @@ namespace UmniahInventorySystem.Controllers
                 return BadRequest(result.Errors);
             }
 
+            var roleResult = await _userManager.AddToRoleAsync(user, "Shop");
+            if (!roleResult.Succeeded)
+            {
+                return BadRequest(roleResult.Errors);
+            }
+
             return Ok();
         }
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)

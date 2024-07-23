@@ -12,7 +12,7 @@ using UmniahInventorySystem.Data;
 namespace UmniahInventorySystem.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240722184836_FirstMigration")]
+    [Migration("20240723130649_FirstMigration")]
     partial class FirstMigration
     {
         /// <inheritdoc />
