@@ -10,7 +10,7 @@ const RegisterForm = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/api/account/register', {
+      const response = await fetch('https://localhost:7238/api/account/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

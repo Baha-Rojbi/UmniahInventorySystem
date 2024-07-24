@@ -6,6 +6,7 @@ using System.Text;
 using UmniahInventorySystem.Data;
 using UmniahInventorySystem.Models;
 using UmniahInventorySystem.Services;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,7 +58,11 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<IOrderService, OrderService>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    });
 
 var app = builder.Build();
 
@@ -88,4 +93,3 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
-
