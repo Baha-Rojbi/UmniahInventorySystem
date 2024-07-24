@@ -23,14 +23,37 @@ public static class SeedData
             await roleManager.CreateAsync(new IdentityRole(ShopRole));
         }
 
+        // Ensures a default shop exists
+        if (!context.Shops.Any(s => s.ShopCode == 0))
+        {
+            context.Shops.Add(new Shop
+            {
+                ShopCode = 0,
+                ShopName = "Default Admin Shop"
+            });
+            await context.SaveChangesAsync();
+        }
+
         if (!userManager.Users.Any(u => u.Email == AdminEmail))
         {
-            var adminUser = new ApplicationUser { UserName = AdminEmail, Email = AdminEmail, ShopId = 0 };
-            var result = await userManager.CreateAsync(adminUser, AdminPassword);
-            if (result.Succeeded)
+            try
             {
-                await userManager.AddToRoleAsync(adminUser, AdminRole);
+                var adminUser = new ApplicationUser { UserName = AdminEmail, Email = AdminEmail, ShopId = 0 };
+                var result = await userManager.CreateAsync(adminUser, AdminPassword);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(adminUser, AdminRole);
+                }
+                else
+                {
+                    throw new Exception(string.Join("\n", result.Errors.Select(e => e.Description)));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while seeding the database.", ex);
             }
         }
     }
+
 }

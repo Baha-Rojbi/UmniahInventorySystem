@@ -42,8 +42,10 @@ namespace UmniahInventorySystem.Controllers
                 return BadRequest(roleResult.Errors);
             }
 
-            return Ok();
+            return Ok(new { message = "Registration successful" });
         }
+
+
 
 
         [HttpPost("login")]
