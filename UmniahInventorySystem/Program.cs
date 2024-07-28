@@ -89,6 +89,7 @@ using (var scope = app.Services.CreateScope())
     var context = services.GetRequiredService<MyDbContext>();
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    context.Database.EnsureCreated(); // Ensure the database is created
     await SeedData.Initialize(context, userManager, roleManager);
 }
 

@@ -8,13 +8,6 @@ namespace UmniahInventorySystem.Data
     {
         public MyDbContext(DbContextOptions<MyDbContext> options) : base(options) { }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseLazyLoadingProxies();
-            optionsBuilder.UseSqlServer(@"Data Source=(localdb)\mssqllocaldb;Initial Catalog=InventorySystem;Integrated Security=true;MultipleActiveResultSets=true");
-            base.OnConfiguring(optionsBuilder);
-        }
-
         public DbSet<Item> Items { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Shop> Shops { get; set; }

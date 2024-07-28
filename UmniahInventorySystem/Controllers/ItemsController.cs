@@ -37,5 +37,23 @@ namespace UmniahInventorySystem.Controllers
 
             return Ok(items);
         }
+
+        [HttpGet("shop/{shopId}")]
+        public async Task<ActionResult<IEnumerable<ItemDto>>> GetItemsByShop(int shopId)
+        {
+            var items = await _context.Items
+                .Where(item => item.ShopId == shopId)
+                .Select(item => new ItemDto
+                {
+                    SerialNumber = item.SerialNumber,
+                    ItemCode = item.ItemCode,
+                    ItemType = item.ItemType,
+                    SubInventoryStatus = item.SubInventoryStatus,
+                    ShopId = item.ShopId
+                })
+                .ToListAsync();
+
+            return Ok(items);
+        }
     }
 }

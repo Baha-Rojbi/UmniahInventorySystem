@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -33,17 +34,20 @@ namespace UmniahInventorySystem.Controllers
 
             if (!result.Succeeded)
             {
-                return BadRequest(result.Errors);
+                var errors = result.Errors.Select(e => new { description = e.Description }).ToList();
+                return BadRequest(errors);
             }
 
             var roleResult = await _userManager.AddToRoleAsync(user, "Shop");
             if (!roleResult.Succeeded)
             {
-                return BadRequest(roleResult.Errors);
+                var errors = roleResult.Errors.Select(e => new { description = e.Description }).ToList();
+                return BadRequest(errors);
             }
 
             return Ok(new { message = "Registration successful" });
         }
+
 
 
 
@@ -89,6 +93,24 @@ namespace UmniahInventorySystem.Controllers
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        [Authorize]
+        [HttpGet("user")]
+        public async Task<ActionResult<ApplicationUser>> GetUser()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
         }
     }
 }
