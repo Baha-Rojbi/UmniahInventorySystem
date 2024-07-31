@@ -23,7 +23,6 @@ public static class SeedData
             await roleManager.CreateAsync(new IdentityRole(ShopRole));
         }
 
-        // Ensures a default shop exists
         if (!context.Shops.Any(s => s.ShopCode == 0))
         {
             context.Shops.Add(new Shop
@@ -55,5 +54,4 @@ public static class SeedData
             }
         }
     }
-
 }

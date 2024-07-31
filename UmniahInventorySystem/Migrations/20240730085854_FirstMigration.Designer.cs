@@ -12,8 +12,8 @@ using UmniahInventorySystem.Data;
 namespace UmniahInventorySystem.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240724164902_AddedItemForEachShop")]
-    partial class AddedItemForEachShop
+    [Migration("20240730085854_FirstMigration")]
+    partial class FirstMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

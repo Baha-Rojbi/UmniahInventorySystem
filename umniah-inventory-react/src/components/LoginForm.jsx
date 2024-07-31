@@ -6,10 +6,12 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const response = await fetch('https://localhost:7238/api/account/login', {
@@ -21,25 +23,18 @@ const LoginForm = () => {
       });
 
       if (!response.ok) {
-        if (response.headers.get('content-type')?.includes('application/json')) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Login failed');
-        } else {
-          throw new Error('Unexpected response format');
-        }
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
       }
 
       const data = await response.json();
-      console.log('Login successful:', data);
-
-      // Save the token to local storage
       localStorage.setItem('token', data.token);
 
       setMessage('Login successful!');
-      // Navigate to items page
+      setLoading(false);
       navigate('/items');
     } catch (error) {
-      console.error('Error:', error);
+      setLoading(false);
       setMessage(`Error: ${error.message}`);
     }
   };
@@ -82,8 +77,9 @@ const LoginForm = () => {
                 <button
                   type="submit"
                   className="py-1 px-8 bg-blue-500 hover:bg-blue-800 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg cursor-pointer select-none"
+                  disabled={loading}
                 >
-                  Login
+                  {loading ? 'Logging in...' : 'Login'}
                 </button>
               </div>
             </form>

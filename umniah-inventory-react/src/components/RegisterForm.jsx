@@ -7,13 +7,13 @@ const RegisterForm = () => {
   const [password, setPassword] = useState('');
   const [shopId, setShopId] = useState('');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      console.log('Registering user with:', { email, password, shopId });
-
       const response = await fetch('https://localhost:7238/api/account/register', {
         method: 'POST',
         headers: {
@@ -22,24 +22,17 @@ const RegisterForm = () => {
         body: JSON.stringify({ email, password, shopId }),
       });
 
-      console.log('Response status:', response.status);
-
       if (!response.ok) {
-        if (response.headers.get('content-type')?.includes('application/json')) {
-          const errorData = await response.json();
-          console.log('Error data:', errorData);
-          const errorMessages = errorData.map((error) => error.description || 'Registration failed');
-          throw new Error(errorMessages.join(', '));
-        } else {
-          throw new Error('Unexpected response format');
-        }
+        const errorData = await response.json();
+        const errorMessages = errorData.map((error) => error.description || 'Registration failed');
+        throw new Error(errorMessages.join(', '));
       }
 
       const data = await response.json();
-      console.log('Registration successful:', data);
       setMessage('Registration successful!');
+      setLoading(false);
     } catch (error) {
-      console.error('Error:', error);
+      setLoading(false);
       setMessage(`Error: ${error.message}`);
     }
   };
@@ -92,8 +85,9 @@ const RegisterForm = () => {
                 <button
                   type="submit"
                   className="py-1 px-8 bg-blue-500 hover:bg-blue-800 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg cursor-pointer select-none"
+                  disabled={loading}
                 >
-                  Register
+                  {loading ? 'Registering...' : 'Register'}
                 </button>
               </div>
             </form>

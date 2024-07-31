@@ -55,5 +55,26 @@ namespace UmniahInventorySystem.Controllers
 
             return Ok(items);
         }
+        [HttpGet("{itemCode}/shops")]
+        public async Task<IActionResult> GetShopsForItem(string itemCode)
+        {
+            try
+            {
+                var shops = await _context.Items
+                    .Where(i => i.ItemCode == itemCode)
+                    .Select(i => i.Shop)
+                    .Distinct()
+                    .ToListAsync();
+
+                return Ok(shops);
+            }
+            catch (Exception ex)
+            {
+                // Log the error if necessary
+                return StatusCode(500, new { message = "An error occurred while fetching shops.", details = ex.Message });
+            }
+        }
+
+
     }
 }

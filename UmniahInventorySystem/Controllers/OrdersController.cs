@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using UmniahInventorySystem.Models;
-using UmniahInventorySystem.Services;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
+using UmniahInventorySystem.Models;
+using UmniahInventorySystem.Services;
+using Microsoft.Extensions.Logging;
 
 namespace UmniahInventorySystem.Controllers
 {
@@ -15,25 +14,24 @@ namespace UmniahInventorySystem.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<OrdersController> _logger;
 
-        public OrdersController(IOrderService orderService, UserManager<ApplicationUser> userManager)
+        public OrdersController(IOrderService orderService, ILogger<OrdersController> logger)
         {
             _orderService = orderService;
-            _userManager = userManager;
+            _logger = logger;
         }
 
         [HttpGet]
-        [Authorize(Roles = "Shop,Admin")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var orders = await _orderService.GetShopOrders(userId);
+            _logger.LogInformation("Fetching all orders");
+
+            var orders = await _orderService.GetOrders();
             return Ok(orders);
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Shop,Admin")]
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
             var order = await _orderService.GetOrderById(id);
@@ -45,20 +43,35 @@ namespace UmniahInventorySystem.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Shop")]
-        public async Task<ActionResult<Order>> CreateOrder([FromBody] Order order)
+        public async Task<IActionResult> CreateOrder([FromBody] Order order)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                _logger.LogWarning("Invalid order data");
+                return BadRequest(new { message = "Invalid order data" });
             }
 
-            var createdOrder = await _orderService.CreateOrder(order);
-            return CreatedAtAction(nameof(GetOrder), new { id = createdOrder.OrderID }, createdOrder);
+            _logger.LogInformation("Attempting to create an order.");
+
+            try
+            {
+                var createdOrder = await _orderService.CreateOrder(order);
+                if (createdOrder == null)
+                {
+                    _logger.LogError("Failed to create order");
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to create order" });
+                }
+
+                return CreatedAtAction(nameof(GetOrder), new { id = createdOrder.OrderID }, createdOrder);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the order");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while creating the order.", details = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Shop")]
         public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order order)
         {
             if (id != order.OrderID)
@@ -76,7 +89,6 @@ namespace UmniahInventorySystem.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Shop")]
         public async Task<IActionResult> DeleteOrder(int id)
         {
             var success = await _orderService.DeleteOrder(id);
@@ -88,7 +100,7 @@ namespace UmniahInventorySystem.Controllers
         }
 
         [HttpPost("{id}/approve")]
-        [Authorize(Roles = "Admin")]
+        
         public async Task<IActionResult> ApproveOrder(int id)
         {
             var success = await _orderService.ApproveOrder(id);
@@ -99,8 +111,9 @@ namespace UmniahInventorySystem.Controllers
             return NoContent();
         }
 
+
         [HttpPost("{id}/transfer")]
-        [Authorize(Roles = "Admin")]
+        
         public async Task<IActionResult> TransferOrder(int id)
         {
             var success = await _orderService.TransferOrder(id);
