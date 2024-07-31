@@ -4,13 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UmniahInventorySystem.Models
 {
-    public enum OrderStatus
-    {
-        Requested,
-        Approved,
-        Transferred
-    }
-
     public class Order
     {
         [Key]
@@ -31,4 +24,12 @@ namespace UmniahInventorySystem.Models
         [ForeignKey("ToShopId")]
         public virtual Shop? ToShop { get; set; }
     }
+
+    public enum OrderStatus
+    {
+        Requested,
+        Approved,
+        Transferred
+    }
+
 }

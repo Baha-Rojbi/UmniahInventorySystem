@@ -55,6 +55,7 @@ namespace UmniahInventorySystem.Controllers
 
             return Ok(items);
         }
+
         [HttpGet("{itemCode}/shops")]
         public async Task<IActionResult> GetShopsForItem(string itemCode)
         {
@@ -74,7 +75,5 @@ namespace UmniahInventorySystem.Controllers
                 return StatusCode(500, new { message = "An error occurred while fetching shops.", details = ex.Message });
             }
         }
-
-
     }
 }

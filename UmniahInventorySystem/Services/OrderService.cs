@@ -72,7 +72,6 @@ namespace UmniahInventorySystem.Services
             return true;
         }
 
-
         public async Task<bool> TransferOrder(int id)
         {
             var order = await _context.Orders

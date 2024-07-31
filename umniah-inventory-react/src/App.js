@@ -1,34 +1,25 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import RegisterForm from './components/RegisterForm';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
+import RegisterForm from './components/RegisterForm';
 import ItemsPage from './components/ItemsPage';
+import AdminOrdersPage from './components/AdminOrdersPage';
 import ShopPage from './components/ShopPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import Navbar from './components/Navbar';
 
 const App = () => {
   return (
     <Router>
-      <div className="container mx-auto p-4">
+      <div>
+        <Navbar />
         <Routes>
-          <Route path="/register" element={<RegisterForm />} />
           <Route path="/login" element={<LoginForm />} />
-          <Route
-            path="/items"
-            element={
-              <ProtectedRoute>
-                <ItemsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/shop/:shopId"
-            element={
-              <ProtectedRoute>
-                <ShopPage />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/items" element={<ProtectedRoute><ItemsPage /></ProtectedRoute>} />
+          <Route path="/shop-items/:shopId" element={<ProtectedRoute><ShopPage /></ProtectedRoute>} />
+          <Route path="/admin-orders" element={<ProtectedRoute><AdminOrdersPage /></ProtectedRoute>} />
+          <Route path="/" element={<LoginForm />} />
         </Routes>
       </div>
     </Router>

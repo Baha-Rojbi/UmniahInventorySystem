@@ -32,7 +32,22 @@ const LoginForm = () => {
 
       setMessage('Login successful!');
       setLoading(false);
-      navigate('/items');
+
+      // Decode the token to check for roles
+      const base64Url = data.token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+
+      const payload = JSON.parse(jsonPayload);
+
+      // Check if the user has the "Admin" role
+      if (payload.role && payload.role.includes('Admin')) {
+        navigate('/admin-orders');
+      } else {
+        navigate('/items');
+      }
     } catch (error) {
       setLoading(false);
       setMessage(`Error: ${error.message}`);

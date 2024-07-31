@@ -48,10 +48,6 @@ namespace UmniahInventorySystem.Controllers
             return Ok(new { message = "Registration successful" });
         }
 
-
-
-
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
@@ -68,19 +64,22 @@ namespace UmniahInventorySystem.Controllers
                 return Unauthorized();
             }
 
-            var token = GenerateJwtToken(user);
+            var token = await GenerateJwtToken(user);
 
             return Ok(new { token });
         }
 
-        private string GenerateJwtToken(ApplicationUser user)
+        private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Id)
             };
+
+            var roles = await _userManager.GetRolesAsync(user);
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -94,6 +93,7 @@ namespace UmniahInventorySystem.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
         [Authorize]
         [HttpGet("user")]
         public async Task<ActionResult<ApplicationUser>> GetUser()
